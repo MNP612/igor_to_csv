@@ -10,11 +10,14 @@ from matplotlib import pyplot as plt
 # "all" to transform all files in a folder
 TRANSFORM = 'all'
 
-PATH = '/Users/Marvin/Documents/Berkeley/Other projects/PECD/Beamtime Data/2019_Apr (DESY)/20190504/'
+PATH = '/Users/Marvin/Desktop/'
 EXTENSION = '.ibw'
-SAVE_PATH = '/Users/Marvin/Desktop/results/'
+SAVE_PATH = '/Users/Marvin/Desktop/'
 
-FILE = 'May04_0013C1s' # use only for "single" mode
+FILE = 'Apr30_0005P2p' # use only for "single" mode
+
+INTEGRATE = True # choose if you want to keep all sweeps (False) or to average over all sweeps (True)
+PLOT = False # choose if you want to plot the data for a quick look (image will not be saved)
 
 ###-------------------------------###
 
@@ -31,6 +34,9 @@ def read(PATH, EXTENSION, FILE):
 
     wave = binary['wave']['wData']
     intensity = np.sum(wave,axis=1).T
+    if INTEGRATE:
+        n_sweeps = len(intensity)
+        intensity = np.sum(intensity, axis=0) / n_sweeps
 
     if pd.DataFrame(intensity).shape[1] > 1:
         df = pd.DataFrame(intensity).T
@@ -41,8 +47,9 @@ def read(PATH, EXTENSION, FILE):
     df['note'] = ''
     df['note'][0] = binary['wave']['note']
 
-    plt.plot(energy_axis,df[0])
-    plt.show()
+    if PLOT:
+        plt.plot(energy_axis,df[0])
+        plt.show()
 
     return df
 
